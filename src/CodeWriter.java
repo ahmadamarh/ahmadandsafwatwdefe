@@ -71,6 +71,8 @@ public class CodeWriter {
                     CodeWriter.outputFile.write("@THAT\nD=M\n" + pushtoStack());
                 }
             }
+
+
         } else if (commandType.equals(Parser.C_POP)) {
             if (segment.equals(LOCAL) || segment.equals(ARGUMENT) || segment.equals(THIS) || segment.equals(THAT)) {
                 CodeWriter.outputFile.write("@" + index + "\nD=A\n" + segmentsTable.get(segment) +
