@@ -139,17 +139,17 @@ public class CodeWriter {
 
     }
 
-    public void writeFunctionCall(String funcName, int numArgs) throws IOException {
+    public void writeFunctionCall(String functionName, int argsNumber) throws IOException {
 
-        CodeWriter.outputFile.write("@CALL"+returnNum+"\n D=A\n @SP\n A=M\n M=D\n @SP\n M=M+1\n" +
+        CodeWriter.outputFile.write("@CALL"+functionName+returnNum+"\n D=A\n @SP\n A=M\n M=D\n @SP\n M=M+1\n" +
                 "@LCL\n D=M\n @SP\n A=M\n M=D\n @SP\n M=M+1\n" +
                 "@ARG\n D=M\n @SP\n A=M\n M=D\n @SP\n M=M+1\n" +
                 "@THIS\n D=M\n @SP\n A=M\n M=D\n @SP\n M=M+1\n" +
                 "@THAT\n D=M\n @SP\n A=M\n M=D\n @SP\n M=M+1\n");
-        CodeWriter.outputFile.write("@"+(numArgs + 5) +"\n D=A\n @SP\n D=M-D\n @ARG\n M=D\n");
+        CodeWriter.outputFile.write("@"+(argsNumber + 5) +"\n D=A\n @SP\n D=M-D\n @ARG\n M=D\n");
         CodeWriter.outputFile.write("@SP\n D=M\n @LCL\n M=D\n");
-        CodeWriter.outputFile.write("@" + funcName + "\n 0;JMP\n");
-        CodeWriter.outputFile.write("(CALL"+returnNum+")\n");
+        CodeWriter.outputFile.write("@" + functionName + "\n 0;JMP\n");
+        CodeWriter.outputFile.write("(CALL"+functionName+returnNum+")\n");
         returnNum++;
     }
 
@@ -241,7 +241,8 @@ public class CodeWriter {
      */
     private void writeInit() throws IOException {
 
-        CodeWriter.outputFile.write("@256\n D=A\n @SP\n M=D\n");
+        CodeWriter.outputFile.write("@256\nD=A\n@SP\nM=D\n");
 //        writeCall("Sys.init", 0);
+
     }
 }
