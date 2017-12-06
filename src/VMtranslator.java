@@ -39,6 +39,19 @@ public class VMtranslator {
                     } else if (parser.commandType().equals(Parser.C_ARITHMETIC)) {
                         codewriter.writeArithmetic(parser.firstArg());
                     }
+                    if(parser.commandType().equals(Parser.C_LABEL)){
+                        codewriter.writeLabel(parser.firstArg());
+                    }
+                    if(parser.commandType().equals(Parser.C_GOTO)){
+                        codewriter.writeGoTo(parser.firstArg());
+                    }
+                    if(parser.commandType().equals(Parser.C_IF_GOTO)){
+                        codewriter.writeIfGoTo(parser.firstArg());
+                    }
+                    if(parser.commandType().equals(Parser.C_CALL)){
+                        codewriter.writeFunctionCall(parser.firstArg(), parser.seconrArg());
+                    }
+
                 }
                 CodeWriter.outputFile.close();
             } else {

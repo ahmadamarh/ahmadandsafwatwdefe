@@ -1,11 +1,11 @@
 
 import com.sun.org.apache.bcel.internal.classfile.Code;
 
+import java.awt.*;
 import java.io.*;
 import java.util.Hashtable;
 
 public class CodeWriter {
-
 
     static BufferedWriter outputFile;
     private int numberOfJump;
@@ -29,6 +29,10 @@ public class CodeWriter {
     private static final String EQUAL = "eq";
     private static final String LESS_THAN = "lt";
     private static final String GREATER_THAN = "gt";
+    //*******************************************************************ahmad edit
+    private static final String LABEL = "label";
+
+    private static int returnNum;
 
 
     /**
@@ -95,6 +99,10 @@ public class CodeWriter {
         }
     }
 
+//    else if(commandType.equals(LABEL)){
+//        CodeWriter.outputFile.write();
+//    }
+
     /**
      * Writes the assembly code that is the translation
      * of the given arithmetic command.
@@ -130,6 +138,36 @@ public class CodeWriter {
         }
 
     }
+
+    public void writeFunctionCall(String funcName, int numArgs) throws IOException {
+
+        CodeWriter.outputFile.write("@CALL"+returnNum+"\n D=A\n @SP\n A=M\n M=D\n @SP\n M=M+1\n" +
+                "@LCL\n D=M\n @SP\n A=M\n M=D\n @SP\n M=M+1\n" +
+                "@ARG\n D=M\n @SP\n A=M\n M=D\n @SP\n M=M+1\n" +
+                "@THIS\n D=M\n @SP\n A=M\n M=D\n @SP\n M=M+1\n" +
+                "@THAT\n D=M\n @SP\n A=M\n M=D\n @SP\n M=M+1\n");
+        CodeWriter.outputFile.write("@"+(numArgs + 5) +"\n D=A\n @SP\n D=M-D\n @ARG\n M=D\n");
+        CodeWriter.outputFile.write("@SP\n D=M\n @LCL\n M=D\n");
+        CodeWriter.outputFile.write("@" + funcName + "\n 0;JMP\n");
+        CodeWriter.outputFile.write("(CALL"+returnNum+")\n");
+        returnNum++;
+    }
+
+    public void writeLabel(String label) throws IOException {
+        CodeWriter.outputFile.write("(" + label + ")\n");
+        // need to make label for function if we inside function???????????????????????????????????????????????????????????????????????
+    }
+
+    public void writeGoTo(String label) throws IOException {
+        CodeWriter.outputFile.write("@" + label + "\n" + "0;JMP\n");
+        // need to make goto for function if we inside function???????????????????????????????????????????????????????????????????????
+    }
+    public void writeIfGoTo(String label) throws IOException {
+        CodeWriter.outputFile.write("@" + label +"\n" + "D;JNE\n");
+        // need to make goto for function if we inside function???????????????????????????????????????????????????????????????????????
+    }
+
+
 
     /**
      * get file out name

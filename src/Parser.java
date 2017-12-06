@@ -18,6 +18,7 @@ public class Parser {
     public static final String C_CALL ="C_CALL";
     public static final String C_GOTO ="C_GOTO";
     public static final String C_IF ="C_IF";
+    public static final String C_IF_GOTO ="C_IF_GOTO"; //added ????????????????????????????????????????????????????????????????????????
     public static final String C_FUNCTION ="C_FUNCTION";
     public static final String C_RETURN ="C_RETURN";
     private ArrayList<String> arithmeticOperators;
@@ -113,8 +114,11 @@ public class Parser {
         else if(curCommand.contains("goto")){
             return C_GOTO;
         }
-        else if (curCommand.contains("if")){
+        else if (curCommand.contains("if")){// do yoy mean that "if-goto? or there somthing else?
             return C_IF;
+        }
+        else if (curCommand.contains("if-goto")){
+            return C_IF_GOTO;
         }
         else if(curCommand.contains("function")){
             return C_FUNCTION;
