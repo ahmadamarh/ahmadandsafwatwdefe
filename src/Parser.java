@@ -152,7 +152,8 @@ public class Parser {
 
             return curCommand.substring(curCommand.indexOf(" ") + 1, curCommand.lastIndexOf(" "));
         } else if (commandType().equals(C_FUNCTION)) {
-            Pattern pFunction = Pattern.compile("\\s*function\\s+([\\w\\\\.]+)\\s+\\d+\\s*"); //check the correct of regex for the name of the function ?? there is need fpr sapavces?????????
+            Pattern pFunction = Pattern.compile("\\s*function\\s+([\\w\\\\.]+)\\s+\\d+\\s*"); //check ith safwat the correct of regex for the name of the function ??
+                                                                                                        // there is need fpr sapaces and tha name should not start with number ! how to make that?????????
             Matcher matchfun = pFunction.matcher(curCommand);
             if (matchfun.find()) {
                 return matchfun.group(1);

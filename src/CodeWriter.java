@@ -1,9 +1,10 @@
 
+import com.sun.org.apache.bcel.internal.classfile.Code;
+
 import java.io.*;
 import java.util.Hashtable;
 
 public class CodeWriter {
-
 
 
     static BufferedWriter outputFile;
@@ -32,9 +33,10 @@ public class CodeWriter {
 
     /**
      * Opens the output file/stream and gets ready to write into it.
+     *
      * @param fileName
      */
-    public  CodeWriter(String fileName){
+    public CodeWriter(String fileName) {
 
         this.fileOutName = fileName;
         this.segmentsTable = MakesegmentsTable();
@@ -43,23 +45,24 @@ public class CodeWriter {
     }
 
     /**
-     *Writes the assembly code that is the translation of the given
-     *command, where command is either C_PUSH or C_POP.
+     * Writes the assembly code that is the translation of the given
+     * command, where command is either C_PUSH or C_POP.
+     *
      * @param commandType
      * @param segment
      * @param index
      * @throws IOException
      */
-    public void writePushPop (String commandType,String segment,int index)throws IOException {
+    public void writePushPop(String commandType, String segment, int index) throws IOException {
 
         if (commandType.equals(Parser.C_PUSH)) {
 
             if (segment.equals(CONSTANT)) {
                 CodeWriter.outputFile.write("@" + index + "\nD=A\n" + pushtoStack());
             } else if (segment.equals(LOCAL) || segment.equals(ARGUMENT) || segment.equals(THIS) ||
-                                                                                            segment.equals(THAT)) {
+                    segment.equals(THAT)) {
                 CodeWriter.outputFile.write("@" + index + "\nD=A\n" + segmentsTable.get(segment) +
-                                                                                    "\nA=M+D\nD=M\n" + pushtoStack());
+                        "\nA=M+D\nD=M\n" + pushtoStack());
             } else if (segment.equals(STATIC)) {
                 CodeWriter.outputFile.write(segmentsTable.get(segment) + index + "\nD=M\n" + pushtoStack());
             } else if (segment.equals(TEMP)) {
@@ -76,73 +79,64 @@ public class CodeWriter {
         } else if (commandType.equals(Parser.C_POP)) {
             if (segment.equals(LOCAL) || segment.equals(ARGUMENT) || segment.equals(THIS) || segment.equals(THAT)) {
                 CodeWriter.outputFile.write("@" + index + "\nD=A\n" + segmentsTable.get(segment) +
-                                                                            "\nD=M+D\n@R13\nM=D\n" + popFromStack());
-            }
-            else if (segment.equals(STATIC)){
-                CodeWriter.outputFile.write("@SP\nM=M-1\nA=M\nD=M\n"+segmentsTable.get(segment)+index+"\nM=D\n");
+                        "\nD=M+D\n@R13\nM=D\n" + popFromStack());
+            } else if (segment.equals(STATIC)) {
+                CodeWriter.outputFile.write("@SP\nM=M-1\nA=M\nD=M\n" + segmentsTable.get(segment) + index + "\nM=D\n");
 
-            }
-            else if(segment.equals(TEMP)){
-                CodeWriter.outputFile.write("@"+(index+5)+"\nD=A\n@R13\nM=D\n"+popFromStack());
-            }
-            else if(segment.equals(POINTER)){
-                if(index == 0){
+            } else if (segment.equals(TEMP)) {
+                CodeWriter.outputFile.write("@" + (index + 5) + "\nD=A\n@R13\nM=D\n" + popFromStack());
+            } else if (segment.equals(POINTER)) {
+                if (index == 0) {
                     CodeWriter.outputFile.write("@SP\nM=M-1\nA=M\nD=M\n@THIS\nM=D\n");
-                }
-                else if(index ==1){
+                } else if (index == 1) {
                     CodeWriter.outputFile.write("@SP\nM=M-1\nA=M\nD=M\n@THAT\nM=D\n");
                 }
             }
         }
     }
+
     /**
      * Writes the assembly code that is the translation
-     *of the given arithmetic command.
+     * of the given arithmetic command.
+     *
      * @param command
      * @throws IOException
      */
-    public void writeArithmetic (String command)throws IOException{
+    public void writeArithmetic(String command) throws IOException {
 
-        if (command.equals(ADD)){
+        if (command.equals(ADD)) {
 
-            CodeWriter.outputFile.write(binaryOperate()+"M=M+D\n");
-        }
-        else if(command.equals(SUB)){
+            CodeWriter.outputFile.write(binaryOperate() + "M=M+D\n");
+        } else if (command.equals(SUB)) {
 
-            CodeWriter.outputFile.write(binaryOperate()+"M=M-D\n");
-        }
-        else if(command.equals(AND)){
-            CodeWriter.outputFile.write(binaryOperate()+"M=M&D\n");
-        }
-        else if(command.equals(OR)){
-            CodeWriter.outputFile.write(binaryOperate()+"M=M|D\n");
-        }
-        else if(command.equals(NEG)){
+            CodeWriter.outputFile.write(binaryOperate() + "M=M-D\n");
+        } else if (command.equals(AND)) {
+            CodeWriter.outputFile.write(binaryOperate() + "M=M&D\n");
+        } else if (command.equals(OR)) {
+            CodeWriter.outputFile.write(binaryOperate() + "M=M|D\n");
+        } else if (command.equals(NEG)) {
             CodeWriter.outputFile.write("@0\nD=A\n@SP\nA=M-1\nM=D-M\n");
-        }
-        else if (command.equals(NOT)){
+        } else if (command.equals(NOT)) {
             CodeWriter.outputFile.write("@SP\nA=M-1\nM=!M\n");
-        }
-        else if (command.equals(EQUAL)){
+        } else if (command.equals(EQUAL)) {
             CodeWriter.outputFile.write(makeJump("JEQ"));
-            this.numberOfJump ++;
-        }
-        else if (command.equals(LESS_THAN)){
+            this.numberOfJump++;
+        } else if (command.equals(LESS_THAN)) {
             CodeWriter.outputFile.write(makeJump("JGT"));
-            this.numberOfJump ++;
-        }
-        else if (command.equals(GREATER_THAN)){
+            this.numberOfJump++;
+        } else if (command.equals(GREATER_THAN)) {
             CodeWriter.outputFile.write(makeJump("JLT"));
-            this.numberOfJump ++;
+            this.numberOfJump++;
         }
 
     }
 
     /**
      * get file out name
+     *
      * @return -file out name
      */
-    public String getFileOutPath(){
+    public String getFileOutPath() {
         return this.fileOutName;
     }
 
@@ -150,14 +144,14 @@ public class CodeWriter {
     /*
      * make some segments table ,and translate it to assembly.
      */
-    private Hashtable<String,String> MakesegmentsTable() {
+    private Hashtable<String, String> MakesegmentsTable() {
         segmentsTable = new Hashtable<String, String>();
         segmentsTable.put(LOCAL, "@LCL");
         segmentsTable.put(ARGUMENT, "@ARG");
         segmentsTable.put(THIS, "@THIS");
         segmentsTable.put(THAT, "@THAT");
-        segmentsTable.put(STATIC, "@"+fileOutName.substring(fileOutName.lastIndexOf("/")+1,
-                                                                                    fileOutName.indexOf(".")+1));
+        segmentsTable.put(STATIC, "@" + fileOutName.substring(fileOutName.lastIndexOf("/") + 1,
+                fileOutName.indexOf(".") + 1));
         return segmentsTable;
 
     }
@@ -165,40 +159,51 @@ public class CodeWriter {
     /*
      *push value to the memory location that SP points at.
      */
-    private String pushtoStack(){
+    private String pushtoStack() {
         return "@SP\nA=M\nM=D\n@SP\nM=M+1\n";
     }
 
     /*
      *pop value from the memory location that SP-1 points at.
      */
-    private String popFromStack(){
+    private String popFromStack() {
         return "@SP\nM=M-1\nA=M\nD=M\n@R13\nA=M\nM=D\n";
     }
 
     /*
      *prepare the last to values in the stack.
      */
-    private String binaryOperate(){
+    private String binaryOperate() {
         return "@SP\nM=M-1\nA=M\nD=M\nA=A-1\n";
     }
 
     /*
      *make some jump table
      */
-    private Hashtable<String,String> makeSomeJump(){
+    private Hashtable<String, String> makeSomeJump() {
         jumpTable = new Hashtable<String, String>();
-        jumpTable.put("JEQ","D;JEQ\n");
-        jumpTable.put("JLT","D;JLT\n");
-        jumpTable.put("JGT","D;JGT\n");
+        jumpTable.put("JEQ", "D;JEQ\n");
+        jumpTable.put("JLT", "D;JLT\n");
+        jumpTable.put("JGT", "D;JGT\n");
         return jumpTable;
     }
 
     /*
      *jumb according to the conditions.
      */
-    private String makeJump(String jumpType){
-        return"@SP\nM=M-1\nA=M\nD=M\nA=A-1\nD=D-M\n@TRUE"+numberOfJump+"\n"+jumpTable.get(jumpType)+
-                "@SP\nA=M-1\nM=0\n@END\n0;JMP\n" +"(TRUE"+numberOfJump+")\n@SP\nA=M-1\nM=-1\n(END)\n" ;
+    private String makeJump(String jumpType) {
+        return "@SP\nM=M-1\nA=M\nD=M\nA=A-1\nD=D-M\n@TRUE" + numberOfJump + "\n" + jumpTable.get(jumpType) +
+                "@SP\nA=M-1\nM=0\n@END\n0;JMP\n" + "(TRUE" + numberOfJump + ")\n@SP\nA=M-1\nM=-1\n(END)\n";
+    }
+
+    /**
+     * Writes assembly code that effects the VM initialization(bootstarp)
+     * this code must placed at the begining of the output file
+     * @throws IOException
+     */
+    private void writeInit() throws IOException {
+
+        CodeWriter.outputFile.write("@256\n D=A\n @SP\n M=D\n");
+//        writeCall("Sys.init", 0);
     }
 }
