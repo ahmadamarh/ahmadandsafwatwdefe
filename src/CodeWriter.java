@@ -169,6 +169,26 @@ public class CodeWriter {
         currentFunc = funcName;
     }
 
+    /**
+     * write assemply code for return command
+     * @throws IOException
+     */
+    public void funReturn() throws IOException {
+        CodeWriter.outputFile.write("@LCL\nD=M\n@FRAME\nM=D\n");//FRAME is temporary variable
+        CodeWriter.outputFile.write("@5\nA=D-A\nD=M\n@RET\nM=D\n");//put return address in the temp cariable RET
+        CodeWriter.outputFile.write("@SP\nA=M-1\nD=M\n@ARG\nA=M\nM=D\n");//reposition the return value for the caller
+        CodeWriter.outputFile.write("@ARG\nD=M+1\n@SP\nM=D\n");//restore SP of the caller
+//        CodeWriter.outputFile.write("@ARG\nD=M+1\n@SP\nM=D\n");//restore THAT of the caller
+
+        CodeWriter.outputFile.write("@1\nD=A\n@FRAME\n@A=M-D\nD=M\n@THAT\nM=D\n");//restore THAT of the caller
+        CodeWriter.outputFile.write("@2\nD=A\n@FRAME\n@A=M-D\nD=M\n@THIS\nM=D\n");//restore THIS of the caller
+        CodeWriter.outputFile.write("@3\nD=A\n@FRAME\n@A=M-D\nD=M\n@ARG\nM=D\n");//restore ARG of the caller
+        CodeWriter.outputFile.write("@4\nD=A\n@FRAME\n@A=M-D\nD=M\n@LCL\nM=D\n");//restore LCL of the caller
+
+        CodeWriter.outputFile.write("@RET\nA=M\n0;JMP\n");//go to return address in the caller code
+
+    }
+
 
 
 
