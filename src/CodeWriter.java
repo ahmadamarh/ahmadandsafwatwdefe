@@ -31,6 +31,7 @@ public class CodeWriter {
     private static final String GREATER_THAN = "gt";
     //*******************************************************************ahmad edit
     private static final String LABEL = "label";
+    private static String currentFunc = "";
 
     private static int returnNum;
 
@@ -139,19 +140,37 @@ public class CodeWriter {
 
     }
 
-    public void writeFunctionCall(String functionName, int argsNumber) throws IOException {
+    public void writeFuncCall(String funcName, int argsNumber) throws IOException {
 
-        CodeWriter.outputFile.write("@CALL"+functionName+returnNum+"\n D=A\n @SP\n A=M\n M=D\n @SP\n M=M+1\n" +
-                "@LCL\n D=M\n @SP\n A=M\n M=D\n @SP\n M=M+1\n" +
-                "@ARG\n D=M\n @SP\n A=M\n M=D\n @SP\n M=M+1\n" +
-                "@THIS\n D=M\n @SP\n A=M\n M=D\n @SP\n M=M+1\n" +
-                "@THAT\n D=M\n @SP\n A=M\n M=D\n @SP\n M=M+1\n");
+        CodeWriter.outputFile.write("@RETURN"+funcName+"_"+returnNum+"\n D=A\n"+pushtoStack() +
+                "@LCL\n D=M\n"+pushtoStack() +
+                "@ARG\n D=M\n"+pushtoStack() +
+                "@THIS\n D=M\n"+pushtoStack() +
+                "@THAT\n D=M\n"+pushtoStack());
         CodeWriter.outputFile.write("@"+(argsNumber + 5) +"\n D=A\n @SP\n D=M-D\n @ARG\n M=D\n");
         CodeWriter.outputFile.write("@SP\n D=M\n @LCL\n M=D\n");
-        CodeWriter.outputFile.write("@" + functionName + "\n 0;JMP\n");
-        CodeWriter.outputFile.write("(CALL"+functionName+returnNum+")\n");
+        CodeWriter.outputFile.write("@" + funcName + "\n 0;JMP\n");
+        CodeWriter.outputFile.write("(RETURN"+funcName+"_"+returnNum+")\n");
         returnNum++;
     }
+
+    /**
+     * declare a label for the function entry and initialize all og the local variables to 0
+     * @param funcName function name
+     * @param k number of local function
+     * @throws IOException
+     */
+    public void declareFunc(String funcName, int k) throws IOException {
+
+        CodeWriter.outputFile.write("(" + funcName + ")\n");
+        for (int i = 0; i < k; i++){
+            CodeWriter.outputFile.write("@SP\n A=M\n M=0\n @SP\n M=M+1\n");
+        }
+        currentFunc = funcName;
+    }
+
+
+
 
     public void writeLabel(String label) throws IOException {
         CodeWriter.outputFile.write("(" + label + ")\n");
