@@ -31,7 +31,7 @@ public class CodeWriter {
     private static final String GREATER_THAN = "gt";
     //*******************************************************************ahmad edit
     private static final String LABEL = "label";
-    private static String currentFunc = "";
+    private static String currentFunc;
 
     private static int returnNum;
 
@@ -142,7 +142,7 @@ public class CodeWriter {
 
     public void writeFuncCall(String funcName, int argsNumber) throws IOException {
 
-        CodeWriter.outputFile.write("@RETURN"+funcName+"_"+returnNum+"\n D=A\n"+pushtoStack() +
+        CodeWriter.outputFile.write("@RETURN"+funcName+"_"+(returnNum++)+"\n D=A\n"+pushtoStack() +
                 "@LCL\n D=M\n"+pushtoStack() +
                 "@ARG\n D=M\n"+pushtoStack() +
                 "@THIS\n D=M\n"+pushtoStack() +
@@ -151,7 +151,6 @@ public class CodeWriter {
         CodeWriter.outputFile.write("@SP\n D=M\n @LCL\n M=D\n");
         CodeWriter.outputFile.write("@" + funcName + "\n 0;JMP\n");
         CodeWriter.outputFile.write("(RETURN"+funcName+"_"+returnNum+")\n");
-        returnNum++;
     }
 
     /**
@@ -193,17 +192,14 @@ public class CodeWriter {
 
 
     public void writeLabel(String label) throws IOException {
-        CodeWriter.outputFile.write("(" + label + ")\n");
-        // need to make label for function if we inside function???????????????????????????????????????????????????????????????????????
+        CodeWriter.outputFile.write("(" +currentFunc+"$"+label + ")\n");
     }
 
     public void writeGoTo(String label) throws IOException {
-        CodeWriter.outputFile.write("@" + label + "\n" + "0;JMP\n");
-        // need to make goto for function if we inside function???????????????????????????????????????????????????????????????????????
+        CodeWriter.outputFile.write("@" +currentFunc+"$"+label+ "\n" + "0;JMP\n");
     }
     public void writeIfGoTo(String label) throws IOException {
-        CodeWriter.outputFile.write("@" + label +"\n" + "D;JNE\n");
-        // need to make goto for function if we inside function???????????????????????????????????????????????????????????????????????
+        CodeWriter.outputFile.write("@" + currentFunc+"$"+label+"\n" + "D;JNE\n");
     }
 
 
@@ -281,7 +277,8 @@ public class CodeWriter {
     private void writeInit() throws IOException {
 
         CodeWriter.outputFile.write("@256\nD=A\n@SP\nM=D\n");
-//        writeCall("Sys.init", 0);
+        currentFunc = "Sys.init";
+        writeFuncCall(currentFunc, 0);
 
     }
 }

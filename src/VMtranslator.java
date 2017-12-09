@@ -49,7 +49,7 @@ public class VMtranslator {
                         codewriter.writeIfGoTo(parser.firstArg());
                     }
                     if(parser.commandType().equals(Parser.C_CALL)){
-                        codewriter.writeFunctionCall(parser.firstArg(), parser.seconrArg());
+                        codewriter.writeFuncCall(parser.firstArg(), parser.seconrArg());
                     }
 
                 }
