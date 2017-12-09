@@ -68,6 +68,7 @@ public class CodeWriter {
                 CodeWriter.outputFile.write("@" + index + "\nD=A\n" + segmentsTable.get(segment) +
                         "\nA=M+D\nD=M\n" + pushtoStack());
             } else if (segment.equals(STATIC)) {
+                System.out.println("fat write push  static");
                 CodeWriter.outputFile.write(segmentsTable.get(segment) + index + "\nD=M\n" + pushtoStack());
             } else if (segment.equals(TEMP)) {
                 CodeWriter.outputFile.write("@" + (index + 5) + "\nD=M\n" + pushtoStack());
@@ -85,6 +86,8 @@ public class CodeWriter {
                 CodeWriter.outputFile.write("@" + index + "\nD=A\n" + segmentsTable.get(segment) +
                         "\nD=M+D\n@R13\nM=D\n" + popFromStack());
             } else if (segment.equals(STATIC)) {
+                System.out.println("fat write  pop static");
+
                 CodeWriter.outputFile.write("@SP\nM=M-1\nA=M\nD=M\n" + segmentsTable.get(segment) + index + "\nM=D\n");
 
             } else if (segment.equals(TEMP)) {
@@ -264,8 +267,51 @@ public class CodeWriter {
      *jumb according to the conditions.
      */
     private String makeJump(String jumpType) {
-        return "@SP\nM=M-1\nA=M\nD=M\nA=A-1\nD=D-M\n@TRUE" + numberOfJump + "\n" + jumpTable.get(jumpType) +
-                "@SP\nA=M-1\nM=0\n@END\n0;JMP\n" + "(TRUE" + numberOfJump + ")\n@SP\nA=M-1\nM=-1\n(END)\n";
+
+        return "@SP\nM=M-1\nA=M\nD=M\n@R13\nM=D\n" +
+                "@SECONDNEG" + numberOfJump +
+                "\nD;JLT\n" +
+                "@SP\nM=M-1\nA=M\nD=M\n" +
+                "@SECONDPOS&FIRSTNEG" + numberOfJump +
+                "\nD;JLT\n" +
+                "@R13\nD=D-M\n" +
+                "@CHECK" + numberOfJump +
+                "\n0;JMP\n" +
+                "(SECONDNEG" + numberOfJump + ")\n" +
+                "@SP\nM=M-1\nA=M\nD=M\n" +
+                "@SECONDNEG&FIRSTPOS" + numberOfJump + "\n" +
+                "D;JGT\n" +
+                "@R13\nD=D-M\n" +
+                "@CHECK" + numberOfJump + "\n" +
+                "0;JMP\n" +
+                "(SECONDPOS&FIRSTNEG" + numberOfJump + ")\n" +
+                "D=-1\n" +
+                "@CHECK" + numberOfJump + "\n" +
+                "0;JMP\n" +
+                "(SECONDNEG&FIRSTPOS" + numberOfJump + ")\n" +
+                "D=1\n" +
+                "@CHECK" + numberOfJump + "\n" +
+                "0;JMP\n" +
+                "(CHECK" + numberOfJump + ")\n" +
+                "@TRUE" + numberOfJump + "\n" +
+                jumpTable.get(jumpType)+
+                "D=0\n" +
+                "@AFTR" + numberOfJump + "\n" +
+                "0;JMP\n" +
+                "(TRUE" + numberOfJump + ")\n" +
+                "D=-1\n" +
+                "@AFTR" + numberOfJump + "\n" +
+                "0;JMP\n" +
+                "(AFTR" + numberOfJump + ")\n" +
+                "@SP\n" +
+                "A=M\n" +
+                "M=D\n" +
+                "@SP\n" +
+                "M=M+1\n";
+
+
+//        return "@SP\nM=M-1\nA=M\nD=M\nA=A-1\nD=D-M\n@TRUE" + numberOfJump + "\n" + jumpTable.get(jumpType) +
+//                "@SP\nA=M-1\nM=0\n@END\n0;JMP\n" + "(TRUE" + numberOfJump + ")\n@SP\nA=M-1\nM=-1\n(END)\n";
     }
 
     /**
