@@ -7,7 +7,6 @@ import java.io.File;
 
 public class VMtranslator {
 
-
     /**
      * translate vm code to assembly code.
      * @param args -fles to translate

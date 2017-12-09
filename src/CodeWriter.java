@@ -32,7 +32,6 @@ public class CodeWriter {
     //*******************************************************************ahmad edit
     private static final String LABEL = "label";
     private static String currentFunc;
-
     private static int returnNum;
 
 
