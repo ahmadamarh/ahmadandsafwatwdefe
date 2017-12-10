@@ -53,7 +53,7 @@ public class VMtranslator {
                         codewriter.writeFuncCall(parser.firstArg(), parser.seconrArg());
                     }
                     if(parser.commandType().equals(Parser.C_FUNCTION)){
-                        codewriter.declareFunc(parser.firstArg(), parser.seconrArg());
+                        codewriter.writeDeclareFunc(parser.firstArg(), parser.seconrArg());
                     }
                     if(parser.commandType().equals(Parser.C_RETURN)){
                         codewriter.funReturn();
@@ -63,15 +63,22 @@ public class VMtranslator {
                 CodeWriter.outputFile.close();
             } else {
                 File[] files1 = fileIn.listFiles();
+
+                //for (File f2 : files1) {
+                  //  System.out.println(f2.getName());}
                 File[] files = Arrays.copyOfRange(files1, 1, files1.length);
+                    System.out.println(fileIn.getName()+ " Fillllllllllllllle name fleIn");
                 CodeWriter codewriter = new CodeWriter(fileIn.getName());
                 CodeWriter.outputFile = new BufferedWriter(new FileWriter(fileIn.getAbsolutePath() +
                                                                         "/" + codewriter.getFileOutPath() + ".asm"));
                 codewriter.writeInit();
 
-                for (File f : files) {
+                for (File f : files1) {
+
                     if (f.getName().endsWith(".vm")) {
-//                                            System.out.println(f.getName());
+                        System.out.println(f.getName() +"filllee name .vm");
+                        codewriter.fileName = f.getName();
+System.out.println( codewriter.fileName);
 
                         Parser parser = new Parser(f.getName());
                         Parser.reader = new BufferedReader(new FileReader(f.getAbsolutePath()));
@@ -93,7 +100,7 @@ public class VMtranslator {
                                 codewriter.writeGoTo(parser.firstArg());
                             }
                             if(parser.commandType().equals(Parser.C_IF_GOTO)){
-                                System.out.println(parser.firstArg());
+//                                System.out.println(parser.firstArg());
 
                                 codewriter.writeIfGoTo(parser.firstArg());
                             }
@@ -101,7 +108,7 @@ public class VMtranslator {
                                 codewriter.writeFuncCall(parser.firstArg(), parser.seconrArg());
                             }
                             if(parser.commandType().equals(Parser.C_FUNCTION)){
-                                codewriter.declareFunc(parser.firstArg(), parser.seconrArg());
+                                codewriter.writeDeclareFunc(parser.firstArg(), parser.seconrArg());
                             }
                             if(parser.commandType().equals(Parser.C_RETURN)){
                                 codewriter.funReturn();

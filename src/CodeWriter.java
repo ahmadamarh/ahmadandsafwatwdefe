@@ -9,7 +9,7 @@ public class CodeWriter {
 
     static BufferedWriter outputFile;
     private int numberOfJump;
-    private String fileOutName;
+    public String fileName;
     private Hashtable<String, String> segmentsTable;
     private Hashtable<String, String> jumpTable;
     private static final String CONSTANT = "constant";
@@ -42,7 +42,7 @@ public class CodeWriter {
      */
     public CodeWriter(String fileName) {
 
-        this.fileOutName = fileName;
+        this.fileName = fileName;
         this.segmentsTable = MakesegmentsTable();
         this.jumpTable = makeSomeJump();
         this.numberOfJump = 0;
@@ -68,8 +68,8 @@ public class CodeWriter {
                 CodeWriter.outputFile.write("@" + index + "\nD=A\n" + segmentsTable.get(segment) +
                         "\nA=M+D\nD=M\n" + pushtoStack());
             } else if (segment.equals(STATIC)) {
-                System.out.println("fat write push  static");
-                CodeWriter.outputFile.write(segmentsTable.get(segment) + index + "\nD=M\n" + pushtoStack());
+                System.out.println("fat write push static - "+fileName);
+                CodeWriter.outputFile.write("@" + fileName + index + "\nD=M\n" + pushtoStack());
             } else if (segment.equals(TEMP)) {
                 CodeWriter.outputFile.write("@" + (index + 5) + "\nD=M\n" + pushtoStack());
             } else if (segment.equals(POINTER)) {
@@ -86,9 +86,9 @@ public class CodeWriter {
                 CodeWriter.outputFile.write("@" + index + "\nD=A\n" + segmentsTable.get(segment) +
                         "\nD=M+D\n@R13\nM=D\n" + popFromStack());
             } else if (segment.equals(STATIC)) {
-                System.out.println("fat write  pop static");
+//                System.out.println("fat write  pop static");
 
-                CodeWriter.outputFile.write("@SP\nM=M-1\nA=M\nD=M\n" + segmentsTable.get(segment) + index + "\nM=D\n");
+                CodeWriter.outputFile.write("@SP\nM=M-1\nA=M\nD=M\n" +"@" + fileName + index + "\nM=D\n");
 
             } else if (segment.equals(TEMP)) {
                 CodeWriter.outputFile.write("@" + (index + 5) + "\nD=A\n@R13\nM=D\n" + popFromStack());
@@ -150,7 +150,7 @@ public class CodeWriter {
                 "@THIS\nD=M\n"+pushtoStack() +
                 "@THAT\nD=M\n"+pushtoStack());
         CodeWriter.outputFile.write("@"+(argsNumber + 5) +"\n D=A\n@SP\nD=M-D\n@ARG\nM=D\n");
-        CodeWriter.outputFile.write("@SP\nD=M\n@LCL\n M=D\n");
+        CodeWriter.outputFile.write("@SP\nD=M\n@LCL\nM=D\n");
         CodeWriter.outputFile.write("@" + funcName + "\n0;JMP\n");
         CodeWriter.outputFile.write("(RETURN_"+funcName+"_"+(returnNum++)+")\n");
 
@@ -162,11 +162,11 @@ public class CodeWriter {
      * @param k number of local function
      * @throws IOException
      */
-    public void declareFunc(String funcName, int k) throws IOException {
-        System.out.println(funcName);
+    public void writeDeclareFunc(String funcName, int k) throws IOException {
+//        System.out.println(funcName);
         CodeWriter.outputFile.write("(" + funcName + ")\n");
         for (int i = 0; i < k; i++){
-            CodeWriter.outputFile.write("@SP\n A=M\n M=0\n @SP\n M=M+1\n");
+            CodeWriter.outputFile.write("@SP\nA=M\nM=0\n@SP\nM=M+1\n");
         }
         currentFunc = funcName;
     }
@@ -202,8 +202,7 @@ public class CodeWriter {
         CodeWriter.outputFile.write("@" +currentFunc+"$"+label+ "\n" + "0;JMP\n");
     }
     public void writeIfGoTo(String label) throws IOException {
-        System.out.println(label);
-        CodeWriter.outputFile.write("@" + currentFunc+"$"+label+"\n" + "D;JNE\n");
+        CodeWriter.outputFile.write("@SP\nM=M-1\nA=M\nD=M\n@" + currentFunc+"$"+label+"\n" + "D;JNE\n");
     }
 
 
@@ -214,7 +213,7 @@ public class CodeWriter {
      * @return -file out name
      */
     public String getFileOutPath() {
-        return this.fileOutName;
+        return this.fileName;
     }
 
 
@@ -227,8 +226,9 @@ public class CodeWriter {
         segmentsTable.put(ARGUMENT, "@ARG");
         segmentsTable.put(THIS, "@THIS");
         segmentsTable.put(THAT, "@THAT");
-        segmentsTable.put(STATIC, "@" + fileOutName.substring(fileOutName.lastIndexOf("/") + 1,
-                fileOutName.indexOf(".") + 1));
+//        segmentsTable.put(STATIC, "@" + fileName);
+//        segmentsTable.put(STATIC, "@" + fileOutName.substring(fileOutName.lastIndexOf("/") + 1,
+//                fileOutName.indexOf(".") + 1));
         return segmentsTable;
 
     }
