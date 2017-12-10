@@ -71,10 +71,14 @@ public class Parser {
             }
             if (curCommand.contains("/")) {
                 curCommand = curCommand.substring(0, curCommand.lastIndexOf('/') - 1);
+//                System.out.println(curCommand + "after removing //");
             }
 
             curCommand = removeSpaces(removePerfixSpace(curCommand));
-            if (curCommand.equals("")) {
+//            System.out.println(curCommand);
+//            System.out.println(curCommand + "after removing spaces");
+
+        if (curCommand.equals("")) {
                 if(this.hasMoreCommands()) {
                     advance();
                 }
@@ -95,6 +99,8 @@ public class Parser {
      * @return - command type
      */
     public String commandType(){
+//        System.out.println(curCommand);
+
         if (curCommand.contains("push")) {
             return C_PUSH;
         }
@@ -102,7 +108,6 @@ public class Parser {
             return C_POP;
         }
         else if (arithmeticOperators.contains(curCommand)) {
-
             return C_ARITHMETIC;
         }
         else if(curCommand.contains("label")){
@@ -128,6 +133,7 @@ public class Parser {
             return C_RETURN;
         }
         else {
+//            System.out.println(curCommand);
             //sholud be null???????????????????????????????????????????????????????????
             return "UNKMOWN TYPE ";
         }
@@ -258,15 +264,24 @@ public class Parser {
      * remove unnecessary spaces
      */
     public static String removeSpaces(String line){
+//        System.out.println(line + " after removing sapces");
         String result = "";
         if (line.length() != 0){
             String[] parts = line.split(" ");
+            if(parts.length == 1){
+                result = line.replaceAll("\\s+","");
+                return result;
+//                System.out.println(result);
+
+            }
             for (String str: parts){
                 result += str;
                 result+= " ";
             }
             result = result.substring(0, result.lastIndexOf(" "));
         }
+//        System.out.println(line + " before removing sapces");
+
         return result;
     }
 

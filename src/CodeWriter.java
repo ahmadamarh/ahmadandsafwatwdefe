@@ -68,7 +68,7 @@ public class CodeWriter {
                 CodeWriter.outputFile.write("@" + index + "\nD=A\n" + segmentsTable.get(segment) +
                         "\nA=M+D\nD=M\n" + pushtoStack());
             } else if (segment.equals(STATIC)) {
-                System.out.println("fat write push static - "+fileName);
+//                System.out.println("fat write push static - "+fileName);
                 CodeWriter.outputFile.write("@" + fileName + index + "\nD=M\n" + pushtoStack());
             } else if (segment.equals(TEMP)) {
                 CodeWriter.outputFile.write("@" + (index + 5) + "\nD=M\n" + pushtoStack());
@@ -114,9 +114,8 @@ public class CodeWriter {
      * @throws IOException
      */
     public void writeArithmetic(String command) throws IOException {
-
+//        System.out.println(command);
         if (command.equals(ADD)) {
-
             CodeWriter.outputFile.write(binaryOperate() + "M=M+D\n");
         } else if (command.equals(SUB)) {
 
@@ -129,7 +128,8 @@ public class CodeWriter {
             CodeWriter.outputFile.write("@0\nD=A\n@SP\nA=M-1\nM=D-M\n");
         } else if (command.equals(NOT)) {
             CodeWriter.outputFile.write("@SP\nA=M-1\nM=!M\n");
-        } else if (command.equals(EQUAL)) {
+        }
+        else if (command.equals(EQUAL)) {
             CodeWriter.outputFile.write(makeJump("JEQ"));
             this.numberOfJump++;
         } else if (command.equals(LESS_THAN)) {
@@ -269,7 +269,7 @@ public class CodeWriter {
      *jumb according to the conditions.
      */
     private String makeJump(String jumpType) {
-
+//        System.out.println("faaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaat");
         return "@SP\nM=M-1\nA=M\nD=M\n@R13\nM=D\n" +
                 "@SECONDNEG" + numberOfJump +
                 "\nD;JLT\n" +

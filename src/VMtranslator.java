@@ -64,10 +64,10 @@ public class VMtranslator {
             } else {
                 File[] files1 = fileIn.listFiles();
 
-                //for (File f2 : files1) {
-                  //  System.out.println(f2.getName());}
-                File[] files = Arrays.copyOfRange(files1, 1, files1.length);
-                    System.out.println(fileIn.getName()+ " Fillllllllllllllle name fleIn");
+//                for (File f2 : files1) {
+//                    System.out.println(f2.getName());}
+//                File[] files = Arrays.copyOfRange(files1, 1, files1.length);
+//                    System.out.println(fileIn.getName()+ " Fillllllllllllllle name fleIn");
                 CodeWriter codewriter = new CodeWriter(fileIn.getName());
                 CodeWriter.outputFile = new BufferedWriter(new FileWriter(fileIn.getAbsolutePath() +
                                                                         "/" + codewriter.getFileOutPath() + ".asm"));
@@ -78,7 +78,7 @@ public class VMtranslator {
                     if (f.getName().endsWith(".vm")) {
                         System.out.println(f.getName() +"filllee name .vm");
                         codewriter.fileName = f.getName();
-System.out.println( codewriter.fileName);
+//System.out.println( codewriter.fileName);
 
                         Parser parser = new Parser(f.getName());
                         Parser.reader = new BufferedReader(new FileReader(f.getAbsolutePath()));
@@ -87,32 +87,41 @@ System.out.println( codewriter.fileName);
                             if (parser.endOfFile) {
                                 break;
                             }
-                            if (parser.commandType().equals(Parser.C_PUSH) || parser.commandType().
+
+                            else if (parser.commandType().equals(Parser.C_PUSH) || parser.commandType().
                                                                                                 equals(Parser.C_POP)) {
+
                                 codewriter.writePushPop(parser.commandType(), parser.firstArg(), parser.seconrArg());
-                            } if (parser.commandType().equals(Parser.C_ARITHMETIC)) {
+                            }
+                            else if (parser.commandType().equals(Parser.C_ARITHMETIC)) {
+//                                System.out.println(parser.curCommand);
+
                                 codewriter.writeArithmetic(parser.firstArg());
                             }
-                            if(parser.commandType().equals(Parser.C_LABEL)){
+                            else if(parser.commandType().equals(Parser.C_LABEL)){
+
                                 codewriter.writeLabel(parser.firstArg());
                             }
-                            if(parser.commandType().equals(Parser.C_GOTO)){
+                           else if(parser.commandType().equals(Parser.C_GOTO)){
+
                                 codewriter.writeGoTo(parser.firstArg());
                             }
-                            if(parser.commandType().equals(Parser.C_IF_GOTO)){
+                            else if(parser.commandType().equals(Parser.C_IF_GOTO)){
 //                                System.out.println(parser.firstArg());
 
                                 codewriter.writeIfGoTo(parser.firstArg());
                             }
-                            if(parser.commandType().equals(Parser.C_CALL)){
+                           else if(parser.commandType().equals(Parser.C_CALL)){
+
                                 codewriter.writeFuncCall(parser.firstArg(), parser.seconrArg());
                             }
-                            if(parser.commandType().equals(Parser.C_FUNCTION)){
+                            else if(parser.commandType().equals(Parser.C_FUNCTION)){
                                 codewriter.writeDeclareFunc(parser.firstArg(), parser.seconrArg());
                             }
-                            if(parser.commandType().equals(Parser.C_RETURN)){
+                            else if(parser.commandType().equals(Parser.C_RETURN)){
                                 codewriter.funReturn();
                             }
+
                         }
                     }
                 }
