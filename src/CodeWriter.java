@@ -133,26 +133,27 @@ public class CodeWriter {
             CodeWriter.outputFile.write(makeJump("JEQ"));
             this.numberOfJump++;
         } else if (command.equals(LESS_THAN)) {
-            CodeWriter.outputFile.write(makeJump("JGT"));
+            CodeWriter.outputFile.write(makeJump("JLT"));
             this.numberOfJump++;
         } else if (command.equals(GREATER_THAN)) {
-            CodeWriter.outputFile.write(makeJump("JLT"));
+            CodeWriter.outputFile.write(makeJump("JGT"));
             this.numberOfJump++;
         }
 
     }
 
     public void writeFuncCall(String funcName, int argsNumber) throws IOException {
+//        System.out.println(funcName);
+        CodeWriter.outputFile.write("@RETURN_"+funcName+"_"+(returnNum)+"\nD=A\n"+pushtoStack() +
+                "@LCL\nD=M\n"+pushtoStack() +
+                "@ARG\nD=M\n"+pushtoStack() +
+                "@THIS\nD=M\n"+pushtoStack() +
+                "@THAT\nD=M\n"+pushtoStack());
+        CodeWriter.outputFile.write("@"+(argsNumber + 5) +"\n D=A\n@SP\nD=M-D\n@ARG\nM=D\n");
+        CodeWriter.outputFile.write("@SP\nD=M\n@LCL\n M=D\n");
+        CodeWriter.outputFile.write("@" + funcName + "\n0;JMP\n");
+        CodeWriter.outputFile.write("(RETURN_"+funcName+"_"+(returnNum++)+")\n");
 
-        CodeWriter.outputFile.write("@RETURN"+funcName+"_"+(returnNum++)+"\n D=A\n"+pushtoStack() +
-                "@LCL\n D=M\n"+pushtoStack() +
-                "@ARG\n D=M\n"+pushtoStack() +
-                "@THIS\n D=M\n"+pushtoStack() +
-                "@THAT\n D=M\n"+pushtoStack());
-        CodeWriter.outputFile.write("@"+(argsNumber + 5) +"\n D=A\n @SP\n D=M-D\n @ARG\n M=D\n");
-        CodeWriter.outputFile.write("@SP\n D=M\n @LCL\n M=D\n");
-        CodeWriter.outputFile.write("@" + funcName + "\n 0;JMP\n");
-        CodeWriter.outputFile.write("(RETURN"+funcName+"_"+returnNum+")\n");
     }
 
     /**
@@ -162,7 +163,7 @@ public class CodeWriter {
      * @throws IOException
      */
     public void declareFunc(String funcName, int k) throws IOException {
-
+        System.out.println(funcName);
         CodeWriter.outputFile.write("(" + funcName + ")\n");
         for (int i = 0; i < k; i++){
             CodeWriter.outputFile.write("@SP\n A=M\n M=0\n @SP\n M=M+1\n");
@@ -181,10 +182,10 @@ public class CodeWriter {
         CodeWriter.outputFile.write("@ARG\nD=M+1\n@SP\nM=D\n");//restore SP of the caller
 //        CodeWriter.outputFile.write("@ARG\nD=M+1\n@SP\nM=D\n");//restore THAT of the caller
 
-        CodeWriter.outputFile.write("@1\nD=A\n@FRAME\n@A=M-D\nD=M\n@THAT\nM=D\n");//restore THAT of the caller
-        CodeWriter.outputFile.write("@2\nD=A\n@FRAME\n@A=M-D\nD=M\n@THIS\nM=D\n");//restore THIS of the caller
-        CodeWriter.outputFile.write("@3\nD=A\n@FRAME\n@A=M-D\nD=M\n@ARG\nM=D\n");//restore ARG of the caller
-        CodeWriter.outputFile.write("@4\nD=A\n@FRAME\n@A=M-D\nD=M\n@LCL\nM=D\n");//restore LCL of the caller
+        CodeWriter.outputFile.write("@1\nD=A\n@FRAME\nA=M-D\nD=M\n@THAT\nM=D\n");//restore THAT of the caller
+        CodeWriter.outputFile.write("@2\nD=A\n@FRAME\nA=M-D\nD=M\n@THIS\nM=D\n");//restore THIS of the caller
+        CodeWriter.outputFile.write("@3\nD=A\n@FRAME\nA=M-D\nD=M\n@ARG\nM=D\n");//restore ARG of the caller
+        CodeWriter.outputFile.write("@4\nD=A\n@FRAME\nA=M-D\nD=M\n@LCL\nM=D\n");//restore LCL of the caller
 
         CodeWriter.outputFile.write("@RET\nA=M\n0;JMP\n");//go to return address in the caller code
 
@@ -201,6 +202,7 @@ public class CodeWriter {
         CodeWriter.outputFile.write("@" +currentFunc+"$"+label+ "\n" + "0;JMP\n");
     }
     public void writeIfGoTo(String label) throws IOException {
+        System.out.println(label);
         CodeWriter.outputFile.write("@" + currentFunc+"$"+label+"\n" + "D;JNE\n");
     }
 
@@ -303,23 +305,15 @@ public class CodeWriter {
                 "@AFTR" + numberOfJump + "\n" +
                 "0;JMP\n" +
                 "(AFTR" + numberOfJump + ")\n" +
-                "@SP\n" +
-                "A=M\n" +
-                "M=D\n" +
-                "@SP\n" +
-                "M=M+1\n";
+                "@SP\nA=M\nM=D\n@SP\nM=M+1\n";
 
-
-//        return "@SP\nM=M-1\nA=M\nD=M\nA=A-1\nD=D-M\n@TRUE" + numberOfJump + "\n" + jumpTable.get(jumpType) +
-//                "@SP\nA=M-1\nM=0\n@END\n0;JMP\n" + "(TRUE" + numberOfJump + ")\n@SP\nA=M-1\nM=-1\n(END)\n";
     }
-
     /**
      * Writes assembly code that effects the VM initialization(bootstarp)
      * this code must placed at the begining of the output file
      * @throws IOException
      */
-    private void writeInit() throws IOException {
+    public void writeInit() throws IOException {
 
         CodeWriter.outputFile.write("@256\nD=A\n@SP\nM=D\n");
         currentFunc = "Sys.init";

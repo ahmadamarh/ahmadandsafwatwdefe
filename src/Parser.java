@@ -111,14 +111,15 @@ public class Parser {
         else if (curCommand.contains("call")){
             return C_CALL;
         }
-        else if(curCommand.contains("goto")){
-            return C_GOTO;
-        }
-        else if (curCommand.contains("if")){// do yoy mean that "if-goto? or there somthing else?
-            return C_IF;
-        }
+
+//        else if (curCommand.contains("if")){// do yoy mean that "if-goto? or there somthing else?
+//            return C_IF;
+//        }
         else if (curCommand.contains("if-goto")){
             return C_IF_GOTO;
+        }
+        else if(curCommand.contains("goto")){
+            return C_GOTO;
         }
         else if(curCommand.contains("function")){
             return C_FUNCTION;
@@ -168,7 +169,7 @@ public class Parser {
             if (matchCall.find()) {
                 return matchCall.group(1);
             }
-        } else if (commandType().equals("C_IF")) {
+        } else if (commandType().equals("C_IF_GOTO")) {
 
             Pattern pIf = Pattern.compile("\\s*if-goto\\s+([\\w]+)\\s*");
             Matcher matchIf = pIf.matcher(curCommand);
@@ -275,7 +276,7 @@ public class Parser {
     private void makeArrayOperators(){
         this.arithmeticOperators.add("add");
         this.arithmeticOperators.add("sub");
-        this.arithmeticOperators.add("neq");
+        this.arithmeticOperators.add("neg");
         this.arithmeticOperators.add("eq");
         this.arithmeticOperators.add("gt");
         this.arithmeticOperators.add("lt");
